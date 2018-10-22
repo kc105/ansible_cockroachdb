@@ -1,0 +1,37 @@
+---
+
+###
+# COCKROACHDB
+###
+
+# Version
+cockroachdb_version: 2.0.6
+
+# Source
+cockroachdb_source_url: https://binaries.cockroachdb.com/cockroach-v{{ cockroachdb_version }}.linux-amd64.tgz
+cockroachdb_source_path: /opt
+cockroachdb_source_link: /usr/local/bin/cockroach
+
+# Mode
+cockroachdb_mode: insecure
+cockroachdb_cluster: true # Or false to deploy standalone server
+
+# User
+cockroachdb_group: cockroachdb
+cockroachdb_user: cockroachdb
+
+# Directories
+cockroachdb_dir_conf: /etc/cockroachdb
+cockroachdb_dir_certs: "{{ cockroachdb_dir_conf }}/certs"
+cockroachdb_dir_log: /var/log/cockroachdb
+cockroachdb_dir_store: /data/cockroachdb/store
+
+# Port
+cockroachdb_http_port: 7005
+cockroachdb_port: 26257
+
+# Logs
+cockroachdb_logtostderr: ERROR
+cockroachdb_log_file_verbosity: WARNING
+cockroachdb_log_dir_max_size: 1GiB
+cockroachdb_log_file_max_size: 100MiB

@@ -1,0 +1,8 @@
+---
+
+###
+# COCKROACHDB
+###
+
+# Global Domaie Name (DNS)
+cockroachdb_dns_zone: wikitops.local

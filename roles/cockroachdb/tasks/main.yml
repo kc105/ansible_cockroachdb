@@ -1,0 +1,46 @@
+---
+
+- name: COCKROACHDB | Manage user
+  import_tasks: users.yml
+
+- name: COCKROACHDB | Manage directories
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: 0755
+  with_items:
+    - { path: "{{ cockroachdb_dir_conf }}", owner: root, group: root }
+    - { path: "{{ cockroachdb_dir_certs }}", owner: root, group: root }
+    - { path: "{{ cockroachdb_dir_log }}", owner: "{{ cockroachdb_user }}", group: "{{ cockroachdb_group }}" }
+    - { path: "{{ cockroachdb_dir_store }}", owner: "{{ cockroachdb_user }}", group: "{{ cockroachdb_group }}" }
+
+- name: COCKROACHDB | Unarchive binaries
+  unarchive:
+    src: "{{ cockroachdb_source_url }}"
+    dest: "{{ cockroachdb_source_path }}"
+    owner: root
+    group: root
+    remote_src: yes
+    creates: "{{ cockroachdb_source_path }}/cockroach-v{{ cockroachdb_version }}.linux-amd64/cockroach"
+  notify: Restart cockroachdb
+
+- name: COCKROACHDB | Manage symlink
+  file:
+    state: link
+    src: "{{ cockroachdb_source_path }}/cockroach-v{{ cockroachdb_version }}.linux-amd64/cockroach"
+    dest: "{{ cockroachdb_source_link }}"
+    owner: root
+    group: root
+    mode: 0755
+  notify: Restart cockroachdb
+
+- name: COCKROACHDB | Manage systemd
+  template:
+    src: lib/systemd/system/cockroachdb.service.j2
+    dest: /lib/systemd/system/cockroachdb.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: Restart cockroachdb

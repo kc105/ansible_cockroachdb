@@ -1,0 +1,49 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=CockroachDB
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+ExecStart={{ cockroachdb_source_link }} start \
+{% if cockroachdb_mode == 'insecure' %}
+                                         --insecure \
+{% else %}
+                                         --certs-dir={{ cockroachdb_dir_certs }} \
+{% endif %}
+                                         --store={{ cockroachdb_dir_store }} \
+                                         --cache=.40 \
+                                         --max-sql-memory=.30 \
+                                         --external-io-dir=/tmp/cockroachdb/externalio \
+                                         --temp-dir=/tmp/ \
+                                         --port={{ cockroachdb_port }} \
+                                         --http-port={{ cockroachdb_http_port }} \
+                                         --log-dir-max-size={{ cockroachdb_log_dir_max_size }} \
+                                         --log-file-verbosity={{ cockroachdb_log_file_verbosity }} \
+                                         --log-file-max-size={{ cockroachdb_log_file_max_size }}
+                                         --logtostderr={{ cockroachdb_logtostderr }} \
+                                         --log-dir={{ cockroachdb_dir_log }} \
+                                         --advertise-host={{ inventory_hostname }} \
+{% if cockroachdb_cluster %}
+                                         --join={{ groups['cockroachdb'] | join(':26257,') }}:{{ cockroachdb_port }} \
+                                         --host={{ inventory_hostname }}
+{% else %}
+                                         --host={{ inventory_hostname }}
+{% endif %}
+
+ExecStop={{ cockroachdb_source_link }} quit \
+{% if cockroachdb_mode == 'insecure' %}
+                                         --insecure
+{% else %}
+                                         --certs-dir={{ cockroachdb_dir_certs }}
+{% endif %}
+SyslogIdentifier=cockroachdb
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+LimitNOFILE=35000
+User={{ cockroachdb_user }}
+Group={{ cockroachdb_group }}

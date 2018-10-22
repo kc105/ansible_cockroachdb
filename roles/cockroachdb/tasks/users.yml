@@ -1,0 +1,15 @@
+---
+
+- name: COCKROACHDB USER | Manage group
+  group:
+    name: "{{ cockroachdb_group }}"
+    state: present
+    system: yes
+
+- name: COCKROACHDB USER | Manage user
+  user:
+    name: "{{ cockroachdb_user }}"
+    comment: "Hadoop hdfs admin user"
+    group: "{{ cockroachdb_group }}"
+    system: yes
+    state: present
